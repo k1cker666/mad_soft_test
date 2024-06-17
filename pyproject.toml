@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "memes-project"
+version = "0.1.0"
+description = ""
+authors = ["k1cker666 <pomoymu@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pre-commit = "^3.7.1"
+isort = "^5.13.2"
+black = "^24.4.2"
+flake8 = "^7.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -13,6 +13,7 @@ black = "^24.4.2"
 flake8 = "^7.1.0"
 fastapi = "^0.111.0"
 sqlalchemy = "^2.0.30"
+pydantic = "^2.7.4"
 
 
 [build-system]

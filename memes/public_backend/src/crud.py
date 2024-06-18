@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from src.models import Meme
-from src.schemas import MemeCreate
+from src.schemas import MemeCreate, MemeUpdate
 
 
 def get_memes(session: Session, offset: int = 0, limit: int = 2) -> list[Meme]:
@@ -22,3 +22,19 @@ def create_meme(session: Session, meme_in: MemeCreate) -> Meme:
     session.commit()
     session.refresh(meme)
     return meme
+
+
+def update_meme(session: Session, meme: Meme, meme_update: MemeUpdate) -> Meme:
+    for name, value in meme_update.model_dump().items():
+        setattr(meme, name, value)
+    session.commit()
+    return meme
+
+
+def delete_meme(
+    session: Session,
+    meme: Meme,
+):
+    session.delete(meme)
+    session.commit()
+    return {"detail": f"Meme {meme.id} was deleted"}

@@ -1,30 +1,29 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, HTTPException, Path, status
+from fastapi import APIRouter, Depends, status
 from src import crud
 from src.dbmanager import db_manager
-from src.schemas import Meme, MemeCreate
+from src.dependencies import meme_by_id
+from src.schemas import Meme, MemeCreate, MemeUpdate
 
 
-router = APIRouter(prefix="/memes")
+router = APIRouter(prefix="/memes", tags=["Memes"])
 
 
-@router.get("/", response_model=list[Meme])
+@router.get(
+    "/",
+    response_model=list[Meme],
+)
 def get_list_memes(session=Depends(db_manager.session_dependency)):
     return crud.get_memes(session=session)
 
 
-@router.get("/{id}/", response_model=Meme)
+@router.get(
+    "/{id}/",
+    response_model=Meme,
+)
 def get_meme_from_id(
-    id: Annotated[int, Path(ge=1)],
-    session=Depends(db_manager.session_dependency),
+    meme: Meme = Depends(meme_by_id),
 ):
-    meme = crud.get_meme(session=session, id=id)
-    if meme is not None:
-        return meme
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail="Meme {id} not found"
-    )
+    return meme
 
 
 @router.post(
@@ -39,18 +38,25 @@ def create_meme(
     return crud.create_meme(session=session, meme_in=meme_in)
 
 
-@router.put("/{id}")
+@router.put(
+    "/{id}",
+    response_model=Meme,
+)
 def update_meme(
-    meme,
+    meme_update: MemeUpdate,
+    meme: Meme = Depends(meme_by_id),
     session=Depends(db_manager.session_dependency),
 ):
-    return {"update": "success"}
+    return crud.update_meme(
+        session=session,
+        meme=meme,
+        meme_update=meme_update,
+    )
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_meme(
-    meme,
-    caption: str,
+    meme: Meme = Depends(meme_by_id),
     session=Depends(db_manager.session_dependency),
 ):
-    return {"delete": "success"}
+    return crud.delete_meme(session=session, meme=meme)

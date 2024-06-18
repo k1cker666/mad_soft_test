@@ -24,10 +24,10 @@ def add_new_meme(meme, caption: str):
 
 
 @router.put("/{id}")
-def update_new_meme(meme):
+def update_meme(meme):
     return {"update": "success"}
 
 
 @router.delete("/{id}")
-def delete_new_meme(meme, caption: str):
+def delete_meme(meme, caption: str):
     return {"delete": "success"}

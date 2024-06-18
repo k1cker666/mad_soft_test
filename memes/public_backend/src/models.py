@@ -8,6 +8,6 @@ memes = Table(
     "memes",
     metadata,
     Column("meme_id", SmallInteger, primary_key=True),
-    Column("image_name", Text, nullable=False),
-    Column("caption", String, nullable=False),
+    Column("file_name", Text, nullable=False),
+    Column("caption", String(500), nullable=False),
 )

@@ -4,8 +4,9 @@ from src.models import Meme
 from src.schemas import MemeCreate, MemeUpdate
 
 
-def get_memes(session: Session, offset: int = 0, limit: int = 2) -> list[Meme]:
-    stmt = select(Meme).order_by(Meme.id).offset(offset).limit(limit)
+def get_memes(session: Session, page: int, size: int) -> list[Meme]:
+    offset = page * size
+    stmt = select(Meme).order_by(Meme.id).offset(offset).limit(size)
     result = session.execute(stmt)
     meme_list = result.scalars().all()
     return meme_list

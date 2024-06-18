@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from src import crud
 from src.dbmanager import db_manager
 from src.dependencies import meme_by_id
@@ -12,8 +12,12 @@ router = APIRouter(prefix="/memes", tags=["Memes"])
     "/",
     response_model=list[Meme],
 )
-def get_list_memes(session=Depends(db_manager.session_dependency)):
-    return crud.get_memes(session=session)
+def get_list_memes(
+    session=Depends(db_manager.session_dependency),
+    page: int = Query(ge=0, le=5, default=0),
+    size: int = Query(ge=1, le=5, default=1),
+):
+    return crud.get_memes(session=session, page=page, size=size)
 
 
 @router.get(

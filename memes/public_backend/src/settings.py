@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     password: str
     host: str
     port: str
+    echo: bool
 
     @property
     def conninfo(self):

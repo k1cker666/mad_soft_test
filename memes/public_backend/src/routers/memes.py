@@ -1,26 +1,31 @@
-import random
 from typing import Annotated
 
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, HTTPException, Path, status
+from src import crud
+from src.schemas import Meme, MemeCreate
 
 
 router = APIRouter(prefix="/memes")
 
 
-@router.get("/")
-def get_list_memes():
-    return {"memes": "list"}
+@router.get("/", response_model=list[Meme])
+def get_list_memes(session):
+    return crud.get_memes(session=session)
 
 
-@router.get("/{id}/")
-def get_meme_from_id(id: Annotated[int, Path(ge=1)]):
-    memes = ["funny meme", "not funny meme", "best meme", "worst meme"]
-    return {"meme": {"meme_id": id, "meme": random.choice(memes)}}
+@router.get("/{id}/", response_model=Meme)
+def get_meme_from_id(session, id: Annotated[int, Path(ge=1)]):
+    meme = crud.get_meme(session=session, id=id)
+    if meme is not None:
+        return meme
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail="Meme {id} not found"
+    )
 
 
-@router.post("/")
-def add_new_meme(meme, caption: str):
-    return {"add": "success"}
+@router.post("/", response_model=Meme)
+def create_meme(session, meme_in: MemeCreate):
+    return crud.create_meme(session=session, meme_in=meme_in)
 
 
 @router.put("/{id}")

@@ -1,7 +1,7 @@
-from models import Meme
-from schemas import MemeCreate
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from src.models import Meme
+from src.schemas import MemeCreate
 
 
 def get_memes(session: Session, offset: int = 0, limit: int = 2) -> list[Meme]:

@@ -32,6 +32,11 @@ pydantic = "^2.7.4"
 psycopg = "^3.1.19"
 pydantic-settings = "^2.3.3"
 
+
+[tool.poetry.group.migrations.dependencies]
+psycopg = {extras = ["binary"], version = "^3.1.19"}
+pydantic-settings = "^2.3.3"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

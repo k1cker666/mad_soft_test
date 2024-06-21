@@ -11,6 +11,4 @@ WORKDIR /project/
 COPY poetry.lock pyproject.toml .psql_env /project/
 RUN poetry install --only=public_api --no-root --no-directory
 
-COPY /memes/public_api/*.py /project/memes/public_api/
-COPY /memes/public_api/src/*.py /project//memes/public_api/src/
-COPY /memes/public_api/src/routers/*.py /project//memes/public_api/src/routers/
+COPY /memes/migrations/*.py /project/memes/migrations/

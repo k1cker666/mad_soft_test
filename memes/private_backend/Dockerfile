@@ -11,5 +11,5 @@ WORKDIR /project/
 COPY poetry.lock pyproject.toml .minio_env /project/
 RUN poetry install --only=private_api --no-root --no-directory
 
-COPY /memes/private_api/*.py /project//memes/private_api/
+COPY /memes/private_api/*.py /project/memes/private_api/
 COPY /memes/private_api/src/*.py /project//memes/private_api/src/

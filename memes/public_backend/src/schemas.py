@@ -1,13 +1,9 @@
+from fastapi import UploadFile
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class MemeBase(BaseModel):
-    file_name: str = Field(
-        ...,
-        min_length=4,
-        max_length=20,
-        caption="Название(минимум 4, максимум 20 символов)",
-    )
+    file: UploadFile
     caption: str = Field(
         ...,
         min_length=1,
@@ -16,15 +12,13 @@ class MemeBase(BaseModel):
     )
 
 
-class MemeCreate(MemeBase):
-    pass
-
-
-class MemeUpdate(MemeBase):
-    pass
-
-
 class Meme(MemeBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+
+
+class MemeOut(BaseModel):
+    id: int
+    file_name: str
+    caption: str

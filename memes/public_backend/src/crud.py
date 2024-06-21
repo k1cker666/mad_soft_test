@@ -1,7 +1,6 @@
-from sqlalchemy import delete, select, update
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from src.models import Meme
-from src.schemas import MemeOut
 
 
 def get_memes(session: Session, page: int, size: int) -> list[Meme]:
@@ -15,12 +14,7 @@ def get_memes(session: Session, page: int, size: int) -> list[Meme]:
 
 def get_meme(session: Session, id: int) -> Meme | None:
     meme = session.query(Meme).filter_by(id=id).one_or_none()
-    if meme is None:
-        return None
-    meme_out = MemeOut(
-        id=meme.id, file_name=meme.file_name, caption=meme.caption
-    )
-    return meme_out
+    return meme
 
 
 def create_meme(session: Session, file_name: str, caption: str):
@@ -30,20 +24,15 @@ def create_meme(session: Session, file_name: str, caption: str):
     session.refresh(meme)
 
 
-def update_meme(session: Session, meme: MemeOut, file_name: str, caption: str):
-    stmt = (
-        update(Meme)
-        .filter_by(id=meme.id)
-        .values(file_name=file_name, caption=caption)
-    )
-    session.execute(stmt)
+def update_meme(session: Session, meme: Meme, file_name: str, caption: str):
+    meme.file_name = file_name
+    meme.caption = caption
     session.commit()
 
 
 def delete_meme(
     session: Session,
-    meme: MemeOut,
+    meme: Meme,
 ):
-    stmt = delete(Meme).filter_by(id=meme.id)
-    session.execute(stmt)
+    session.delete(meme)
     session.commit()

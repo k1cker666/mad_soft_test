@@ -16,9 +16,3 @@ class Meme(MemeBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-
-
-class MemeOut(BaseModel):
-    id: int
-    file_name: str
-    caption: str

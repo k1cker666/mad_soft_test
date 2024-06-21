@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Form, Query, UploadFile, status
 from src import crud
 from src.dbmanager import db_manager
 from src.dependencies import is_meme_name_available, meme_by_id
-from src.schemas import MemeOut
+from src.models import Meme
 
 
 router = APIRouter(prefix="/memes", tags=["Memes"])
@@ -22,7 +22,7 @@ def get_list_memes(
 
 @router.get("/{id}/")
 def get_meme_from_id(
-    meme: MemeOut = Depends(meme_by_id),
+    meme: Meme = Depends(meme_by_id),
 ):
     file_name = meme.file_name
     return {"file_name": file_name}
@@ -43,7 +43,7 @@ def create_meme(
 def update_meme(
     file: UploadFile,
     caption: Annotated[str, Form()],
-    meme: MemeOut = Depends(meme_by_id),
+    meme: Meme = Depends(meme_by_id),
     session=Depends(db_manager.session_dependency),
 ):
     is_meme_name_available(session=session, meme_name=file.filename)
@@ -58,7 +58,7 @@ def update_meme(
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_meme(
-    meme: MemeOut = Depends(meme_by_id),
+    meme: Meme = Depends(meme_by_id),
     session=Depends(db_manager.session_dependency),
 ):
     crud.delete_meme(session=session, meme=meme)

@@ -24,6 +24,14 @@ fastapi = "^0.111.0"
 pydantic-settings = "^2.3.3"
 minio = "^7.2.7"
 
+
+[tool.poetry.group.public_api.dependencies]
+fastapi = "^0.111.0"
+sqlalchemy = "^2.0.31"
+pydantic = "^2.7.4"
+psycopg = "^3.1.19"
+pydantic-settings = "^2.3.3"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

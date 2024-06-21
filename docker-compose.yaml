@@ -6,9 +6,6 @@ x-minio-common: &minio-common
   ports:
     - "9000:9000"
     - "9090:9090"
-  # environment:
-    # MINIO_ROOT_USER: minioadmin
-    # MINIO_ROOT_PASSWORD: minioadmin
   healthcheck:
     test: ["CMD", "mc", "ready", "local"]
     interval: 5s

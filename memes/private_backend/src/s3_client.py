@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from minio import Minio
 from src.settings import Settings, settings
 
@@ -21,6 +23,20 @@ class S3_client:
         bucket = self.s3_client.bucket_exists(self.bucket_name)
         if not bucket:
             self.s3_client.make_bucket(self.bucket_name)
+
+    def get_meme(self, file_name: str) -> BytesIO:
+        response = self.s3_client.get_object(
+            bucket_name=self.bucket_name, object_name=file_name
+        )
+        data = BytesIO(response.read)
+        response.close()
+        response.release_conn()
+        return data
+
+    def put_meme(self, file_name: str, data: BytesIO):
+        self.s3_client.put_object(
+            bucket_name=self.bucket_name, object_name=file_name, data=data
+        )
 
 
 s3_client = S3_client(settings=settings)

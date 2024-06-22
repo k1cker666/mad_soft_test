@@ -34,7 +34,7 @@ async def get_meme_from_id(
     meme: Meme = Depends(meme_by_id),
 ):
     file_name = meme.file_name
-    response = requests.get(f"http://localhost:8020/get_meme/{file_name}")
+    response = requests.get(f"http://private_api:8002/get_meme/{file_name}")
     return Response(content=response.content, media_type="image/jpeg")
 
 
@@ -48,7 +48,7 @@ async def create_meme(
     crud.create_meme(session=session, file_name=file.filename, caption=caption)
     file_content = await file.read()
     files = {"file": (file.filename, file_content, file.content_type)}
-    requests.post(url="http://localhost:8020/post_meme/", files=files)
+    requests.post(url="http://private_api:8002/post_meme/", files=files)
     return {"message": "Meme created"}
 
 
@@ -67,10 +67,10 @@ async def update_meme(
         file_name=file.filename,
         caption=caption,
     )
-    requests.delete(url=f"http://localhost:8020/delete_meme/{old_meme_name}")
+    requests.delete(url=f"http://private_api:8002/delete_meme/{old_meme_name}")
     file_content = await file.read()
     files = {"file": (file.filename, file_content, file.content_type)}
-    requests.post(url="http://localhost:8020/post_meme/", files=files)
+    requests.post(url="http://private_api:8002/post_meme/", files=files)
     return {"message": "Meme updated"}
 
 
@@ -80,5 +80,7 @@ async def delete_meme(
     session=Depends(db_manager.session_dependency),
 ):
     crud.delete_meme(session=session, meme=meme)
-    requests.delete(url=f"http://localhost:8020/delete_meme/{meme.file_name}")
+    requests.delete(
+        url=f"http://private_api:8002/delete_meme/{meme.file_name}"
+    )
     return {"detail": f"Meme {meme.id} was deleted"}

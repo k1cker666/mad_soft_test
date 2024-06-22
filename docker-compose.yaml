@@ -1,10 +1,7 @@
-version: "3.8"
-
 x-minio-common: &minio-common
   image: quay.io/minio/minio:RELEASE.2024-06-13T22-53-53Z
   command: server --console-address ":9090" mnt/data
   ports:
-    - "9000:9000"
     - "9090:9090"
   healthcheck:
     test: ["CMD", "mc", "ready", "local"]
@@ -20,9 +17,9 @@ services:
     env_file:
       - .psql_env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${PSQL_USER}
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_DB: ${PSQL_DBNAME}
     ports:
       - 5001:5432
     volumes:
@@ -30,13 +27,14 @@ services:
 
   minio:
     <<: *minio-common
+    container_name: minio
     hostname: minio
     env_file:
       - .minio_env
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-      MINIO_VOLUMES: /mnt/data
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_VOLUMES: ${MINIO_VOLUMES}
     ports:
       - 9090:9090
       - 9000:9000
@@ -45,42 +43,30 @@ services:
         source: /home/kicker/mad_soft_test/.minio
         target: /mnt/data
 
-  # migrations:
-  #   build:
-  #     context: ./
-  #     dockerfile: memes/migrations/Dockerfile
-  #   restart: "no"
-  #   container_name: migrations
-  #   env_file:
-  #     - .psql_env
-  #   depends_on:
-  #     - postgres
-  #   command: sh -c "sleep 7 && while ! pg_isready -d ${PSQL_DBNAME} -h ${PSQL_HOST} -p ${PSQL_PORT} -U ${PSQL_USER}; do sleep 10; done
-  #     && python3 memes/migrations/script.py"
+  public_api:
+    build:
+      context: ./
+      dockerfile: memes/public_backend/Dockerfile
+    restart: always
+    container_name: public_api
+    env_file:
+      - .psql_env
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+    command: sh -c "sleep 7 && while ! pg_isready -d ${PSQL_DBNAME} -h ${PSQL_HOST} -p ${PSQL_PORT} -U ${PSQL_USER}; do sleep 10; done
+      && gunicorn main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
 
-  # public_api:
-  #   build:
-  #     context: ./
-  #     dockerfile: memes/public_backend/Dockerfile
-  #   restart: always
-  #   container_name: public_api
-  #   env_file:
-  #     - .psql_env
-  #   ports:
-  #     - 8000:8000
-  #   depends_on:
-  #     - postgres
-  #   command: sh -c "sleep 7 && while ! pg_isready -d ${PSQL_DBNAME} -h ${PSQL_HOST} -p ${PSQL_PORT} -U ${PSQL_USER}; do sleep 10; done
-  #     && gunicorn main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
-
-  # private_api:
-  #   build:
-  #     context: ./
-  #     dockerfile: memes/private_backend/Dockerfile
-  #   restart: always
-  #   container_name: private_api
-  #   env_file:
-  #     - .minio_env
-  #   depends_on:
-  #     - minio
-  #   command: sh -c "gunicorn main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8002"
+  private_api:
+    build:
+      context: ./
+      dockerfile: memes/private_backend/Dockerfile
+    restart: always
+    container_name: private_api
+    env_file:
+      - .minio_env
+    depends_on:
+      - minio
+      - public_api
+    command: sh -c "gunicorn main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8002"

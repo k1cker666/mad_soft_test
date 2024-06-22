@@ -5,9 +5,12 @@ venv/
 .venv/
 .postgres/
 .minio/
+images/
+tests/
 
 
 *.py[cod]
 test.py
 .psql_env
 .minio_env
+.env

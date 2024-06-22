@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from src.models import Base
 from src.settings import settings
 
 
@@ -14,11 +15,15 @@ class DBManager:
             autoflush=False,
             expire_on_commit=False,
         )
+        self.__create_all()
 
     def session_dependency(self):
         with self.session_factory() as session:
             yield session
             session.close()
+
+    def __create_all(self):
+        Base.metadata.create_all(self.engine)
 
 
 db_manager = DBManager(

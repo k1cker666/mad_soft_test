@@ -26,8 +26,7 @@ async def get_list_memes(
     size: int = Query(ge=1, le=5, default=1),
 ):
     memes_list = crud.get_memes(session=session, page=page, size=size)
-    meme_names_string = ",".join(memes_list)
-    return {"names": meme_names_string}
+    return {"memes": memes_list}
 
 
 @router.get("/{id}/")
@@ -60,6 +59,7 @@ async def update_meme(
     meme: Meme = Depends(meme_by_id),
     session=Depends(db_manager.session_dependency),
 ):
+    old_meme_name = meme.file_name
     is_meme_name_available(session=session, meme_name=file.filename)
     crud.update_meme(
         session=session,
@@ -67,7 +67,7 @@ async def update_meme(
         file_name=file.filename,
         caption=caption,
     )
-    requests.delete(url=f"http://localhost:8020/delete_meme/{meme.file_name}")
+    requests.delete(url=f"http://localhost:8020/delete_meme/{old_meme_name}")
     file_content = await file.read()
     files = {"file": (file.filename, file_content, file.content_type)}
     requests.post(url="http://localhost:8020/post_meme/", files=files)

@@ -8,7 +8,7 @@ def get_memes(session: Session, page: int, size: int) -> list[Meme]:
     stmt = select(Meme).order_by(Meme.id).offset(offset).limit(size)
     result = session.execute(stmt)
     meme_list = result.scalars().all()
-    meme_name_list = [meme.file_name for meme in meme_list]
+    meme_name_list = [meme.__dict__ for meme in meme_list]
     return meme_name_list
 
 

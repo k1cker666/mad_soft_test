@@ -42,5 +42,10 @@ class S3_client:
             length=file.size,
         )
 
+    def delete_meme(self, file_name: str):
+        self.s3_client.remove_object(
+            bucket_name=self.bucket_name, object_name=file_name
+        )
+
 
 s3_client = S3_client(settings=settings)

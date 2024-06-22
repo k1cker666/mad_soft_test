@@ -20,13 +20,14 @@ router = APIRouter(prefix="/memes", tags=["Memes"])
 
 
 @router.get("/")
-def get_list_memes(
+async def get_list_memes(
     session=Depends(db_manager.session_dependency),
     page: int = Query(ge=0, le=5, default=0),
     size: int = Query(ge=1, le=5, default=1),
 ):
     memes_list = crud.get_memes(session=session, page=page, size=size)
-    return {"meme_name_list": memes_list}
+    meme_names_string = ",".join(memes_list)
+    return {"names": meme_names_string}
 
 
 @router.get("/{id}/")
@@ -48,16 +49,12 @@ async def create_meme(
     crud.create_meme(session=session, file_name=file.filename, caption=caption)
     file_content = await file.read()
     files = {"file": (file.filename, file_content, file.content_type)}
-    response = requests.post(
-        url="http://localhost:8020/post_meme/", files=files
-    )
-    if response.status_code == 200:
-        return {"message": "Meme created"}
+    requests.post(url="http://localhost:8020/post_meme/", files=files)
     return {"message": "Meme created"}
 
 
 @router.put("/{id}")
-def update_meme(
+async def update_meme(
     file: UploadFile,
     caption: Annotated[str, Form()],
     meme: Meme = Depends(meme_by_id),
@@ -70,13 +67,18 @@ def update_meme(
         file_name=file.filename,
         caption=caption,
     )
+    requests.delete(url=f"http://localhost:8020/delete_meme/{meme.file_name}")
+    file_content = await file.read()
+    files = {"file": (file.filename, file_content, file.content_type)}
+    requests.post(url="http://localhost:8020/post_meme/", files=files)
     return {"message": "Meme updated"}
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_meme(
+@router.delete("/{id}")
+async def delete_meme(
     meme: Meme = Depends(meme_by_id),
     session=Depends(db_manager.session_dependency),
 ):
     crud.delete_meme(session=session, meme=meme)
+    requests.delete(url=f"http://localhost:8020/delete_meme/{meme.file_name}")
     return {"detail": f"Meme {meme.id} was deleted"}

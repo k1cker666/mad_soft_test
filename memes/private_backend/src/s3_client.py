@@ -1,5 +1,6 @@
 from io import BytesIO
 
+from fastapi import UploadFile
 from minio import Minio
 from src.settings import Settings, settings
 
@@ -28,14 +29,17 @@ class S3_client:
         response = self.s3_client.get_object(
             bucket_name=self.bucket_name, object_name=file_name
         )
-        data = BytesIO(response.read)
+        data = BytesIO(response.read())
         response.close()
         response.release_conn()
         return data
 
-    def put_meme(self, file_name: str, data: BytesIO):
+    def put_meme(self, file: UploadFile):
         self.s3_client.put_object(
-            bucket_name=self.bucket_name, object_name=file_name, data=data
+            bucket_name=self.bucket_name,
+            object_name=file.filename,
+            data=file.file,
+            length=file.size,
         )
 
 

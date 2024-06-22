@@ -37,4 +37,4 @@ class Migration:
 if __name__ == "__main__":
     db = Migration(settings.conninfo)
     db.create_table()
-    db.insert_memes()
+    # db.insert_memes()

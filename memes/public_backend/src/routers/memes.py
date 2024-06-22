@@ -1,6 +1,15 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Form, Query, UploadFile, status
+import requests
+from fastapi import (
+    APIRouter,
+    Depends,
+    Form,
+    Query,
+    Response,
+    UploadFile,
+    status,
+)
 from src import crud
 from src.dbmanager import db_manager
 from src.dependencies import is_meme_name_available, meme_by_id
@@ -21,21 +30,29 @@ def get_list_memes(
 
 
 @router.get("/{id}/")
-def get_meme_from_id(
+async def get_meme_from_id(
     meme: Meme = Depends(meme_by_id),
 ):
     file_name = meme.file_name
-    return {"file_name": file_name}
+    response = requests.get(f"http://localhost:8020/get_meme/{file_name}")
+    return Response(content=response.content, media_type="image/jpeg")
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_meme(
+async def create_meme(
     file: UploadFile,
     caption: Annotated[str, Form()],
     session=Depends(db_manager.session_dependency),
 ):
     is_meme_name_available(session=session, meme_name=file.filename)
     crud.create_meme(session=session, file_name=file.filename, caption=caption)
+    file_content = await file.read()
+    files = {"file": (file.filename, file_content, file.content_type)}
+    response = requests.post(
+        url="http://localhost:8020/post_meme/", files=files
+    )
+    if response.status_code == 200:
+        return {"message": "Meme created"}
     return {"message": "Meme created"}
 
 

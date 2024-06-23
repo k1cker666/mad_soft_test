@@ -5,8 +5,7 @@ venv/
 .venv/
 .postgres/
 .minio/
-images/
-tests/
+minio/
 
 
 *.py[cod]

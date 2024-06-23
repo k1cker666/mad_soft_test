@@ -23,6 +23,7 @@ class DBManager:
             session.close()
 
     def __create_all(self):
+        Base.metadata.drop_all(self.engine)
         Base.metadata.create_all(self.engine)
 
 

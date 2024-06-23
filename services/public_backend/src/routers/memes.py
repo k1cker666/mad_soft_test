@@ -75,7 +75,7 @@ async def update_meme(
         return {"message": "Meme updated"}
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_meme(
     meme: Meme = Depends(meme_by_id),
     session=Depends(db_manager.session_dependency),

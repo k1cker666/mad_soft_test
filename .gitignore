@@ -3,7 +3,14 @@
 __pycache__/
 venv/
 .venv/
+.postgres/
+.minio/
+minio/
+
 
 *.py[cod]
 test.py
+.psql_env
+.minio_env
 .env
+pytest.ini

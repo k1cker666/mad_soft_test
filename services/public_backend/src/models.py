@@ -11,5 +11,5 @@ class Base(DeclarativeBase):
 class Meme(Base):
     __tablename__ = "memes"
 
-    file_name: Mapped[str] = mapped_column(String(20))
+    file_name: Mapped[str] = mapped_column(String(20), index=True)
     caption: Mapped[str] = mapped_column(String(500))

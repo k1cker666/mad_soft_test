@@ -16,7 +16,30 @@ sqlalchemy = "^2.0.30"
 pydantic = "^2.7.4"
 psycopg = "^3.1.19"
 pydantic-settings = "^2.3.3"
+minio = "^7.2.7"
+python-dotenv = "^1.0.1"
+requests = "^2.32.3"
 
+
+[tool.poetry.group.private_api.dependencies]
+fastapi = "^0.111.0"
+pydantic-settings = "^2.3.3"
+minio = "^7.2.7"
+gunicorn = "^22.0.0"
+
+
+[tool.poetry.group.public_api.dependencies]
+fastapi = "^0.111.0"
+sqlalchemy = "^2.0.31"
+pydantic = "^2.7.4"
+psycopg = "^3.1.19"
+pydantic-settings = "^2.3.3"
+gunicorn = "^22.0.0"
+
+
+[tool.poetry.group.migrations.dependencies]
+psycopg = {extras = ["binary"], version = "^3.1.19"}
+pydantic-settings = "^2.3.3"
 
 [build-system]
 requires = ["poetry-core"]

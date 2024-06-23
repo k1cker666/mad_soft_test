@@ -15,7 +15,7 @@ services:
     image: postgres:14.11
     container_name: psql_db
     env_file:
-      - .psql_env
+      - .env
     environment:
       POSTGRES_USER: ${PSQL_USER}
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
@@ -30,14 +30,11 @@ services:
     container_name: minio
     hostname: minio
     env_file:
-      - .minio_env
+      - .env
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_VOLUMES: ${MINIO_VOLUMES}
-    ports:
-      - 9090:9090
-      - 9000:9000
     volumes:
       - type: bind
         source: /home/kicker/mad_soft_test/.minio
@@ -46,11 +43,11 @@ services:
   public_api:
     build:
       context: ./
-      dockerfile: memes/public_backend/Dockerfile
+      dockerfile: services/public_backend/Dockerfile
     restart: always
     container_name: public_api
     env_file:
-      - .psql_env
+      - .env
     ports:
       - 8000:8000
     depends_on:
@@ -61,11 +58,11 @@ services:
   private_api:
     build:
       context: ./
-      dockerfile: memes/private_backend/Dockerfile
+      dockerfile: services/private_backend/Dockerfile
     restart: always
     container_name: private_api
     env_file:
-      - .minio_env
+      - .env
     depends_on:
       - minio
       - public_api

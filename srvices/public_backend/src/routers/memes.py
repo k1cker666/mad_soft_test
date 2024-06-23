@@ -22,8 +22,8 @@ router = APIRouter(prefix="/memes", tags=["Memes"])
 @router.get("/")
 async def get_list_memes(
     session=Depends(db_manager.session_dependency),
-    page: int = Query(ge=0, le=5, default=0),
-    size: int = Query(ge=1, le=5, default=1),
+    page: int = Query(ge=0, default=0),
+    size: int = Query(ge=1, le=20, default=1),
 ):
     memes_list = crud.get_memes(session=session, page=page, size=size)
     return {"memes": memes_list}
@@ -40,16 +40,21 @@ async def get_meme_from_id(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_meme(
-    file: UploadFile,
+    file_in: UploadFile,
     caption: Annotated[str, Form()],
     session=Depends(db_manager.session_dependency),
 ):
-    is_meme_name_available(session=session, meme_name=file.filename)
-    crud.create_meme(session=session, file_name=file.filename, caption=caption)
-    file_content = await file.read()
-    files = {"file": (file.filename, file_content, file.content_type)}
-    requests.post(url="http://private_api:8002/post_meme/", files=files)
-    return {"message": "Meme created"}
+    is_meme_name_available(session=session, meme_name=file_in.filename)
+    file_content = await file_in.read()
+    file = {"file": (file_in.filename, file_content, file_in.content_type)}
+    response = requests.post(
+        url="http://private_api:8002/post_meme/", files=file
+    )
+    if response.status_code == 201:
+        crud.create_meme(
+            session=session, file_name=file.filename, caption=caption
+        )
+        return {"message": "Meme created"}
 
 
 @router.put("/{id}")
@@ -59,19 +64,22 @@ async def update_meme(
     meme: Meme = Depends(meme_by_id),
     session=Depends(db_manager.session_dependency),
 ):
-    old_meme_name = meme.file_name
+    old_file_name = meme.file_name
     is_meme_name_available(session=session, meme_name=file.filename)
-    crud.update_meme(
-        session=session,
-        meme=meme,
-        file_name=file.filename,
-        caption=caption,
-    )
-    requests.delete(url=f"http://private_api:8002/delete_meme/{old_meme_name}")
+    requests.delete(url=f"http://private_api:8002/delete_meme/{old_file_name}")
     file_content = await file.read()
     files = {"file": (file.filename, file_content, file.content_type)}
-    requests.post(url="http://private_api:8002/post_meme/", files=files)
-    return {"message": "Meme updated"}
+    response = requests.post(
+        url="http://private_api:8002/post_meme/", files=files
+    )
+    if response.status_code == 201:
+        crud.update_meme(
+            session=session,
+            meme=meme,
+            file_name=file.filename,
+            caption=caption,
+        )
+        return {"message": "Meme updated"}
 
 
 @router.delete("/{id}")

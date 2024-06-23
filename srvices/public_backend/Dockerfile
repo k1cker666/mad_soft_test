@@ -14,8 +14,8 @@ WORKDIR /project/
 COPY poetry.lock pyproject.toml .psql_env /project/
 RUN poetry install --only=public_api --no-root --no-directory
 
-COPY /memes/public_backend/*.py /project/memes/public_backend/
-COPY /memes/public_backend/src/*.py /project/memes/public_backend/src/
-COPY /memes/public_backend/src/routers/*.py /project/memes/public_backend/src/routers/
+COPY /services/public_backend/*.py /project/services/public_backend/
+COPY /services/public_backend/src/*.py /project/services/public_backend/src/
+COPY /services/public_backend/src/routers/*.py /project/services/public_backend/src/routers/
 
-WORKDIR /project/memes/public_backend/
+WORKDIR /project/services/public_backend/

@@ -21,7 +21,6 @@ def create_meme(session: Session, file_name: str, caption: str):
     meme = Meme(**{"file_name": file_name, "caption": caption})
     session.add(meme)
     session.commit()
-    session.refresh(meme)
 
 
 def update_meme(session: Session, meme: Meme, file_name: str, caption: str):

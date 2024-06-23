@@ -7,9 +7,6 @@ app = FastAPI()
 app.include_router(memes_router)
 
 
-@app.get("/")
-def main():
-    return {
-        "detail": "Memes home page",
-        "message": "Welcome to memes home page",
-    }
+@app.get("/ping/")
+async def ping():
+    return {"message": "pong"}

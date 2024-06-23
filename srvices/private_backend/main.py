@@ -17,6 +17,6 @@ async def put_meme(file: UploadFile):
     s3_client.put_meme(file=file)
 
 
-@app.delete("/delete_meme/{file_name}", status_code=status.HTTP_201_CREATED)
+@app.delete("/delete_meme/{file_name}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_meme(file_name: str):
     s3_client.delete_meme(file_name=file_name)

@@ -45,7 +45,7 @@ async def create_meme(
     session=Depends(db_manager.session_dependency),
 ):
     is_meme_name_available(session=session, meme_name=file_in.filename)
-    response = await private_client.create_meme(file=file_in)
+    response = await private_client.create_meme(file_in=file_in)
     if response.status_code == 201:
         crud.create_meme(
             session=session, file_name=file_in.filename, caption=caption

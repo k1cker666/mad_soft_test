@@ -19,8 +19,6 @@ pydantic-settings = "^2.3.3"
 minio = "^7.2.7"
 python-dotenv = "^1.0.1"
 requests = "^2.32.3"
-repackage = "^0.7.3"
-yandex-taxi-testsuite = "^0.2.1"
 
 
 [tool.poetry.group.private_api.dependencies]
@@ -37,7 +35,6 @@ pydantic = "^2.7.4"
 psycopg = "^3.1.19"
 pydantic-settings = "^2.3.3"
 gunicorn = "^22.0.0"
-pytest = "^8.2.2"
 
 
 [tool.poetry.group.migrations.dependencies]
